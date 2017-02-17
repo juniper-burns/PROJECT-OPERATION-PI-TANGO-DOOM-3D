@@ -240,4 +240,9 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         //mSurfaceHolder.unlockCanvasAndPost(canvas);
         return canvas;
     }
+
+    public void releaseCanvas(Canvas c) {
+        mSurfaceHolder.unlockCanvasAndPost(c);
+    }
+
 }

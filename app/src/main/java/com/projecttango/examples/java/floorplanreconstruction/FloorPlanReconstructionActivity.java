@@ -379,9 +379,10 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
         int duration = Toast.LENGTH_SHORT;
         Canvas canvas = mFloorplanView.getCanvas();
         String fileName = "/Export.png";
-        File outputBitmap = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + fileName);
+        File outputBitmap = new File(Environment.getExternalStorageDirectory() + fileName);
         //File outputBitmap = new File(context.getFilesDir(), fileName);
         Bitmap bmp = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
+        mFloorplanView.releaseCanvas(canvas);
         FileOutputStream bmpFileStream;
 
         canvas.setBitmap(bmp);
