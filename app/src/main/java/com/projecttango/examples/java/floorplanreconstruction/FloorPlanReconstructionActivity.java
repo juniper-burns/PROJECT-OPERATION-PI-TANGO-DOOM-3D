@@ -37,6 +37,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -44,6 +45,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -97,6 +99,17 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
         mExportButton = (Button) findViewById(R.id.export_button);
 
         mFloorplanView = (FloorplanView) findViewById(R.id.floorplan);
+        mFloorplanView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int x = (int) motionEvent.getX();
+                int y = (int) motionEvent.getY();
+                Bitmap bitmap = Bitmap.createBitmap(mFloorplanView.getDrawingCache());
+                bitmap.setPixel(x, y, Color.RED);
+                mFloorplanView.getCanvas().setBitmap(bitmap);
+                return false;
+            }
+        });
         mFloorplanView.registerCallback(this);
         mAreaText = (TextView) findViewById(R.id.area_text);
 
