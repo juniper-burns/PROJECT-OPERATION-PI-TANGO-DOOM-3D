@@ -16,7 +16,7 @@
 
 package com.projecttango.examples.java.floorplanreconstruction;
 
-import com.google.atap.tango.reconstruction.TangoPolygon;
+
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
@@ -28,31 +28,43 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPointCloudData;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
+import com.google.atap.tango.reconstruction.TangoPolygon;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.display.DisplayManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.media.MediaScannerConnection;
+import android.view.ScaleGestureDetector;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.projecttango.tangosupport.TangoSupport;
 
@@ -66,11 +78,17 @@ import com.projecttango.tangosupport.TangoSupport;
  * Rendering is done in a simplistic way, using the canvas API over a SurfaceView.
  */
 public class FloorPlanReconstructionActivity extends Activity implements FloorplanView
-        .DrawingCallback {
+        .DrawingCallback{
     private static final String TAG = FloorPlanReconstructionActivity.class.getSimpleName();
 
-    private static final String CAMERA_PERMISSION = Manifest.permission.CAMERA;
-    private static final int CAMERA_PERMISSION_CODE = 0;
+    private static final String[] PERMISSIONS = {Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+    private static final int PERMISSION_ALL = 0;
+
+
+
+    public static float X = -1000000;       //x coord
+    public static float Y = -1000000;       //y coord
 
     private TangoFloorplanner mTangoFloorplanner;
     private Tango mTango;
@@ -84,6 +102,8 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
     private FloorplanView mFloorplanView;
     private TextView mAreaText;
 
+    private ContextWrapper cw;
+    private Canvas canvas;
     private int mDisplayRotation = 0;
 
     @Override
@@ -372,37 +392,101 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
         Toast.makeText(context, text, duration).show();
     }
 
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+
     public void onExportClicked(View view) {
 
-        Context context = getApplicationContext();
+        cw = new ContextWrapper(getApplicationContext());
+        Bitmap bmp = Bitmap.createBitmap((mFloorplanView.getWidth()*2), (mFloorplanView.getHeight()*2), Bitmap.Config.ARGB_8888);
+
+
         CharSequence text = "Data successfully exported.";
+
+        //Get the root directory for the external storage
+        String root = Environment.getExternalStorageDirectory().toString();
         int duration = Toast.LENGTH_SHORT;
-        Canvas canvas = mFloorplanView.getCanvas();
-        String fileName = "/Export.png";
-        File outputBitmap = new File(Environment.getExternalStorageDirectory() + fileName);
-        //File outputBitmap = new File(context.getFilesDir(), fileName);
-        Bitmap bmp = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
-        mFloorplanView.releaseCanvas(canvas);
-        FileOutputStream bmpFileStream;
+        canvas = new Canvas(bmp);
+        //view.draw(canvas);
+        mFloorplanView.doDraw(canvas);
 
-        canvas.setBitmap(bmp);
+        //Path to the current directory, to where we will be saving the file to
+        File myPath = new File(root + "/Album 1");
+        //Makes the directory if it is not there
+        myPath.mkdir();
 
-        if(outputBitmap.canWrite()) {
-            try {
-                bmpFileStream = new FileOutputStream(outputBitmap);
-                if (!bmp.compress(Bitmap.CompressFormat.PNG, 100, bmpFileStream)) {
-                    throw new Exception();
-                }
-                bmpFileStream.close();
-            } catch (Exception e) {
-                text = "Failed to export file.";
-            }
-        } else {
-            text = "No write access to file location: " + outputBitmap.toString();
+        //Generate a random name for the image file
+        Random generator = new Random();
+        int n = 10000;
+        n = generator.nextInt(n);
+        String fname = "Image-"+ n +".png";
+        File file = new File (myPath, fname);
+
+        //Add the photo to the gallery on the phone
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Uri contentUri = Uri.fromFile(file);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+
+        try
+        {
+            FileOutputStream bmpFileStream = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG,100,bmpFileStream);
+            bmpFileStream.flush();
+            bmpFileStream.close();
+            Toast.makeText(cw, text, duration).show();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            text = "No write access to file location: " + myPath.toString();
+            Toast.makeText(cw, text, duration).show();
         }
 
-        Toast.makeText(context, text, duration).show();
+
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+
+
+
+        //plot the point on the canvas
+        try
+        {
+            if(ev.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                canvas = mFloorplanView.getCanvas();
+
+
+
+                X = ev.getX();
+                Y = ev.getY();
+                //canvas.drawColor(Color.RED);
+
+                Log.d(getClass().getSimpleName(), "X: " + X + " Y: " + Y + "COLOR: " + Color.RED);
+                mFloorplanView.releaseCanvas(canvas);
+                return true;
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+
+
+        return false;
+
+    }
+
 
     /**
      * Set the display rotation.
@@ -418,30 +502,35 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
      * @return True if we have the necessary permissions, false if we haven't.
      */
     private boolean checkAndRequestPermissions() {
-        if (!hasCameraPermission()) {
-            requestCameraPermission();
+
+        if (!hasPermissions(PERMISSIONS)) {
+            requestStoragePermission();
+
             return false;
         }
         return true;
     }
 
-    /**
-     * Check we have the necessary permissions for this app.
-     */
-    private boolean hasCameraPermission() {
-        return ContextCompat.checkSelfPermission(this, CAMERA_PERMISSION) ==
-                PackageManager.PERMISSION_GRANTED;
+
+    public boolean hasPermissions(String... permissions) {
+
+            for (String permission : permissions) {
+                if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+
+        return true;
     }
 
     /**
      * Request the necessary permissions for this app.
      */
-    private void requestCameraPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, CAMERA_PERMISSION)) {
-            showRequestPermissionRationale();
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{CAMERA_PERMISSION},
-                    CAMERA_PERMISSION_CODE);
+    private void requestStoragePermission()
+    {
+
+        if(!hasPermissions(PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
     }
 
@@ -456,7 +545,21 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         ActivityCompat.requestPermissions(FloorPlanReconstructionActivity.this,
-                                new String[]{CAMERA_PERMISSION}, CAMERA_PERMISSION_CODE);
+                                new String[]{PERMISSIONS[0]}, PERMISSION_ALL);
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void showRequestPermissionRationaleStorage() {
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setMessage("Java Floorplan Reconstruction Example requires storage permission")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ActivityCompat.requestPermissions(FloorPlanReconstructionActivity.this,
+                                new String[]{PERMISSIONS[1]}, PERMISSION_ALL);
                     }
                 })
                 .create();
@@ -482,12 +585,14 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
-        if (hasCameraPermission()) {
+        if (hasPermissions(PERMISSIONS)) {
             bindTangoService();
         } else {
             Toast.makeText(this, "Java Floorplan Reconstruction Example requires camera permission",
                     Toast.LENGTH_LONG).show();
         }
     }
+
+
 
 }

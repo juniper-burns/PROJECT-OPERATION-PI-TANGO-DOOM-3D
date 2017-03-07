@@ -19,15 +19,19 @@ package com.projecttango.examples.java.floorplanreconstruction;
 import com.google.atap.tango.reconstruction.TangoPolygon;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +49,9 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
     // Scale between meters and pixels. Hardcoded to a reasonable default.
     private static final float SCALE = 100f;
 
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     private volatile List<TangoPolygon> mPolygons = new ArrayList<>();
 
     private Paint mWallPaint;
@@ -59,6 +66,10 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
 
     private boolean mIsDrawing = false;
     private SurfaceHolder mSurfaceHolder;
+
+    public int width;
+    public int height;
+
 
     /**
      * Custom render thread, running at a fixed 10Hz rate.
@@ -80,6 +91,8 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         }
     };
     private RenderThread mDrawThread;
+
+
 
     /**
      * Pre drawing callback.
@@ -135,6 +148,10 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         mUserMarkerPath.lineTo(0, 0);
         mCamera = new Matrix();
         mCameraInverse = new Matrix();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL);
+        paint2.setColor(Color.rgb(254, 0 ,0));
+        paint2.setStyle(Paint.Style.FILL);
 
         // Register for surface callback events.
         getHolder().addCallback(this);
@@ -158,7 +175,7 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         mIsDrawing = false;
     }
 
-    private void doDraw(Canvas canvas) {
+    public void doDraw(Canvas canvas) {
         // Notify the activity so that it can use Tango to query the current device pose.
         if (mCallback != null) {
             mCallback.onPreDrawing();
@@ -211,6 +228,9 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         // Draw a user / device marker.
         canvas.concat(mCameraInverse);
         canvas.drawPath(mUserMarkerPath, mUserMarkerPaint);
+
+        canvas.drawCircle(FloorPlanReconstructionActivity.X,FloorPlanReconstructionActivity.Y, 20, paint);
+        canvas.drawPoint(FloorPlanReconstructionActivity.X * SCALE,FloorPlanReconstructionActivity.Y * SCALE, paint2);
     }
 
     /**
@@ -244,5 +264,7 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
     public void releaseCanvas(Canvas c) {
         mSurfaceHolder.unlockCanvasAndPost(c);
     }
+
+
 
 }
