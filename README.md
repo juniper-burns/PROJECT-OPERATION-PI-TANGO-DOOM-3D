@@ -47,11 +47,14 @@ symbol.
 ## Usage
 
 Using this application simply requires you to connect your Google Tango enabled device to your machine and then run and build the 
-application onto it through Android Studio. After that, the app will map out the floor plan of the building you are in by you walking
-around with the camera pointed at the walls. As you scan the environment, you can add waypoints seen as red dots where your PI data
-sources are located. Then, you can export the image to the Gallery on your Android device and from there upload it to the custom symbol
-on PI Coresight. The symbol will search for the waypoints and automatically create an object at each point where a tag can be associated
-with it in order to display all the relevant data for that data source.
+application onto it through Android Studio. 
+
+After that, the app will map out the floor plan of the building you are in by you walking around with the camera pointed at the walls.
+As you scan the environment, you can add waypoints seen as red dots where your PI data sources are located. 
+
+Then, you can export the image to the Gallery on your Android device and from there upload it to the custom symbol on PI Coresight. The
+symbol will search for the waypoints and automatically create an object at each point where a tag can be associated with it in order 
+to display all the relevant data for that data source.
 
 ## Credits
 
