@@ -1,7 +1,7 @@
 # PROJECT-OPERATION-PI-TANGO-DOOM-3D
 
 This is a project to be submitted to the OSISoft 2017 User's Conference PI Coresight Hackathon. This project is a proof of concept for 
-determining if Google's new Augmented Reality project, Google Tango, would be useful and applicable to consumers of PI and it's systems. 
+determining if Google's new Augmented Reality project, Google Tango, would be useful and applicable to consumers of PI and its systems. 
 This project is a combination of an Android Application and a PI Coresight Symbol. The goals of this project are layed out in the 
 following steps:
 
