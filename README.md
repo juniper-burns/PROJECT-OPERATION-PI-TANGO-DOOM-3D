@@ -29,8 +29,8 @@ include anything associated to the AF Element connected to the waypoint.
 model and make it available through Virtual Reality goggles, enabling users to walk through a facility and view PI data through an 
 immersive experience.
 
-While we do not expect to reach every step by the Hackathon's completion, we do hope completeing even one of them will be 
-proof-of-concept enough.
+While we do not expect to reach every step by the Hackathon's completion, we do hope completeing even one of them will be enough of a
+proof of concept.
 
 ## Installation
 
