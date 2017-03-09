@@ -25,6 +25,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -148,9 +149,9 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         mUserMarkerPath.lineTo(0, 0);
         mCamera = new Matrix();
         mCameraInverse = new Matrix();
-        paint.setColor(Color.RED);
+        paint.setColor(Color.rgb(0, 0 ,0));
         paint.setStyle(Paint.Style.FILL);
-        paint2.setColor(Color.rgb(254, 0 ,0));
+        paint2.setColor(Color.rgb(0, 255 ,0));
         paint2.setStyle(Paint.Style.FILL);
 
         // Register for surface callback events.
@@ -187,6 +188,7 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         // Start drawing from the center of the canvas.
         float translationX = canvas.getWidth() / 2f;
         float translationY = canvas.getHeight() / 2f;
+
         canvas.translate(translationX, translationY);
 
         // Update position and orientation based on the device position and orientation.
@@ -229,8 +231,18 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         canvas.concat(mCameraInverse);
         canvas.drawPath(mUserMarkerPath, mUserMarkerPaint);
 
-        canvas.drawCircle(FloorPlanReconstructionActivity.X,FloorPlanReconstructionActivity.Y, 20, paint);
-        canvas.drawPoint(FloorPlanReconstructionActivity.X * SCALE,FloorPlanReconstructionActivity.Y * SCALE, paint2);
+        //draw the points to the canvas(more than one will stay)
+        for(Point point: FloorPlanReconstructionActivity.points)
+        {
+            canvas.concat(mCamera);
+            canvas.drawCircle((point.x-703), (point.y-1350), 20, paint);
+            canvas.drawPoint((point.x-703), (point.y-1350), paint2);
+
+        }
+
+
+
+        //invalidate();
     }
 
     /**

@@ -42,6 +42,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -85,11 +87,12 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
 
     private static final int PERMISSION_ALL = 0;
 
-
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public static float X = -1000000;       //x coord
     public static float Y = -1000000;       //y coord
-
+    public static List<Point> points = new ArrayList<Point>();
     private TangoFloorplanner mTangoFloorplanner;
     private Tango mTango;
     private TangoConfig mConfig;
@@ -372,8 +375,10 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
         mIsPaused = !mIsPaused;
     }
 
-    public void onClearButtonClicked(View v) {
+    public void onClearButtonClicked(View v)
+    {
         mTangoFloorplanner.resetFloorplan();
+        points.clear();
     }
 
     public void onUndoClicked(View view) {
@@ -419,18 +424,18 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
         mFloorplanView.doDraw(canvas);
 
         //Path to the current directory, to where we will be saving the file to
-        File myPath = new File(root + "/Album 1");
+        File myPath = new File(root + "/Tango");
         //Makes the directory if it is not there
         myPath.mkdir();
 
         //Generate a random name for the image file
         Random generator = new Random();
-        int n = 10000;
+        int n = 50000;
         n = generator.nextInt(n);
         String fname = "Image-"+ n +".png";
         File file = new File (myPath, fname);
 
-        //Add the photo to the gallery on the phone
+        //Add the photo to the gallery
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         Uri contentUri = Uri.fromFile(file);
         mediaScanIntent.setData(contentUri);
@@ -455,10 +460,8 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-
-
-
+    public boolean onTouchEvent(MotionEvent ev)
+    {
         //plot the point on the canvas
         try
         {
@@ -466,15 +469,19 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
             {
                 canvas = mFloorplanView.getCanvas();
 
-
-
-                X = ev.getX();
-                Y = ev.getY();
+                Point p = new Point();
+                p.x = (int)ev.getRawX();
+                p.y = (int)ev.getRawY();
+                points.add(p);
+                //X = ev.getRawX();
+                //Y = ev.getRawY();
                 //canvas.drawColor(Color.RED);
 
-                Log.d(getClass().getSimpleName(), "X: " + X + " Y: " + Y + "COLOR: " + Color.RED);
+
+                Log.d(getClass().getSimpleName(), "X: " + p.x + " Y: " + p.y + "COLOR: " + Color.RED);
                 mFloorplanView.releaseCanvas(canvas);
-                return true;
+                //return true;
+                //mFloorplanView.invalidate();
             }
         }
         catch (Exception e)

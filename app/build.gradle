@@ -38,6 +38,8 @@ repositories {
         dirs external_lib_prefix + '/aar'
         dirs 'libs/jar'
         dirs 'libs/aar'
+        dirs '../../TangoReleaseLibs/aar'
+        dirs '../../TangoReleaseLibs/jar'
     }
 }
 
@@ -45,6 +47,8 @@ dependencies {
     compile 'org.rajawali3d:rajawali:1.0.325@aar'
     compile 'com.android.support:appcompat-v7:23.0.0'
     compile(name: 'tango_ux_support_library', ext: 'aar')
-    compile(name: 'tango_support_java_lib', ext: 'aar')
-    compile files('libs/jar/tango_java_lib.jar')
+    compile(name: 'TangoSupport_Eisa_Java', ext: 'aar')
+    compile(name: 'TangoSDK_Eisa_Java', ext: 'jar')
+
+
 }

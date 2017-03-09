@@ -3,8 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PROJECT-OPERATION-PI-TANGO-DOOM-3D.iml" filepath="$PROJECT_DIR$/PROJECT-OPERATION-PI-TANGO-DOOM-3D.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TangoSDK_Eisa_Java/TangoSDK_Eisa_Java.iml" filepath="$PROJECT_DIR$/TangoSDK_Eisa_Java/TangoSDK_Eisa_Java.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/../java_examples_utils/app/java_examples_utils.iml" filepath="$PROJECT_DIR$/../java_examples_utils/app/java_examples_utils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tango_java_lib/tango_java_lib.iml" filepath="$PROJECT_DIR$/tango_java_lib/tango_java_lib.iml" />
     </modules>
   </component>
 </project>
