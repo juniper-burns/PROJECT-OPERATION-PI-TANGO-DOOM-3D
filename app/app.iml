@@ -116,9 +116,9 @@
     <orderEntry type="library" exported="" name="rajawali-1.0.325" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="TangoSupport_Eisa_Java-" level="project" />
-    <orderEntry type="library" exported="" name="TangoSDK_Eisa_Java" level="project" />
     <orderEntry type="library" exported="" name="support-v4-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="tango_ux_support_library-" level="project" />
+    <orderEntry type="library" exported="" name="tango_java_lib" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="android-android-23" level="project" />
   </component>

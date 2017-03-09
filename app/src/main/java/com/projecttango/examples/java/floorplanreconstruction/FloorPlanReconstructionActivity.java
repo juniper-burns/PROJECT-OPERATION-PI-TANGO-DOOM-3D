@@ -39,15 +39,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.hardware.display.DisplayManager;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -87,8 +91,7 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
 
     private static final int PERMISSION_ALL = 0;
 
-    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+
 
     public static float X = -1000000;       //x coord
     public static float Y = -1000000;       //y coord
@@ -411,7 +414,10 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
     public void onExportClicked(View view) {
 
         cw = new ContextWrapper(getApplicationContext());
-        Bitmap bmp = Bitmap.createBitmap((mFloorplanView.getWidth()*2), (mFloorplanView.getHeight()*2), Bitmap.Config.ARGB_8888);
+        Matrix rotate = new Matrix();
+        rotate.postRotate(90);
+        Bitmap bmp1 = Bitmap.createBitmap(mFloorplanView.getWidth()*2, mFloorplanView.getHeight()*2, Bitmap.Config.ARGB_8888);
+
 
 
         CharSequence text = "Data successfully exported.";
@@ -419,7 +425,7 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
         //Get the root directory for the external storage
         String root = Environment.getExternalStorageDirectory().toString();
         int duration = Toast.LENGTH_SHORT;
-        canvas = new Canvas(bmp);
+        canvas = new Canvas(bmp1);
         //view.draw(canvas);
         mFloorplanView.doDraw(canvas);
 
@@ -430,23 +436,26 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
 
         //Generate a random name for the image file
         Random generator = new Random();
-        int n = 50000;
+        int n = 1000;
         n = generator.nextInt(n);
         String fname = "Image-"+ n +".png";
         File file = new File (myPath, fname);
 
         //Add the photo to the gallery
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        Uri contentUri = Uri.fromFile(file);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
+
+
 
         try
         {
+            Bitmap bmp2 = Bitmap.createBitmap(bmp1,0,0,bmp1.getWidth(), bmp1.getHeight(), rotate,true);
             FileOutputStream bmpFileStream = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG,100,bmpFileStream);
+            bmp2.compress(Bitmap.CompressFormat.PNG,100,bmpFileStream);
             bmpFileStream.flush();
             bmpFileStream.close();
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            Uri contentUri = Uri.fromFile(file);
+            mediaScanIntent.setData(contentUri);
+            this.sendBroadcast(mediaScanIntent);
             Toast.makeText(cw, text, duration).show();
         }
         catch (Exception e)
@@ -472,6 +481,7 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
                 Point p = new Point();
                 p.x = (int)ev.getRawX();
                 p.y = (int)ev.getRawY();
+
                 points.add(p);
                 //X = ev.getRawX();
                 //Y = ev.getRawY();

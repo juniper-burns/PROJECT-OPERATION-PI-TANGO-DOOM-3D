@@ -48,7 +48,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.0'
     compile(name: 'tango_ux_support_library', ext: 'aar')
     compile(name: 'TangoSupport_Eisa_Java', ext: 'aar')
-    compile(name: 'TangoSDK_Eisa_Java', ext: 'jar')
+    compile(name: 'tango_java_lib', ext: 'jar')
 
 
 }

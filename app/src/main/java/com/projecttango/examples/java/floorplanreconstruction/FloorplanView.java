@@ -50,8 +50,8 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
     // Scale between meters and pixels. Hardcoded to a reasonable default.
     private static final float SCALE = 100f;
 
-    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint paint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint paint = new Paint();
+    private final Paint paint2 = new Paint();
 
     private volatile List<TangoPolygon> mPolygons = new ArrayList<>();
 
@@ -149,10 +149,11 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         mUserMarkerPath.lineTo(0, 0);
         mCamera = new Matrix();
         mCameraInverse = new Matrix();
-        paint.setColor(Color.rgb(0, 0 ,0));
+        paint.setColor(Color.rgb(255,0,0));
         paint.setStyle(Paint.Style.FILL);
-        paint2.setColor(Color.rgb(0, 255 ,0));
+        paint2.setColor(Color.rgb(254,0,0));
         paint2.setStyle(Paint.Style.FILL);
+
 
         // Register for surface callback events.
         getHolder().addCallback(this);
@@ -230,13 +231,14 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         // Draw a user / device marker.
         canvas.concat(mCameraInverse);
         canvas.drawPath(mUserMarkerPath, mUserMarkerPaint);
-
+        canvas.concat(mCamera);
         //draw the points to the canvas(more than one will stay)
         for(Point point: FloorPlanReconstructionActivity.points)
         {
-            canvas.concat(mCamera);
+
             canvas.drawCircle((point.x-703), (point.y-1350), 20, paint);
             canvas.drawPoint((point.x-703), (point.y-1350), paint2);
+
 
         }
 
