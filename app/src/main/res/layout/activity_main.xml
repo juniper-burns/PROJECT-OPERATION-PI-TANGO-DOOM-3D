@@ -5,7 +5,9 @@
     <com.projecttango.examples.java.floorplanreconstruction.FloorplanView
         android:id="@+id/floorplan"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/area_label"

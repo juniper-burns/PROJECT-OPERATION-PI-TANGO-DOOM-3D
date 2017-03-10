@@ -90,7 +90,9 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
     private static final String[] PERMISSIONS = {Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     private static final int PERMISSION_ALL = 0;
-
+    public static float[] devicePosition;
+    public static float[] deviceOrientation;
+    public static float yawRadians;
 
 
     public static float X = -1000000;       //x coord
@@ -306,9 +308,9 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
 
                 if (devicePose.statusCode == TangoPoseData.POSE_VALID) {
                     // Extract position and rotation around Z.
-                    float[] devicePosition = devicePose.getTranslationAsFloats();
-                    float[] deviceOrientation = devicePose.getRotationAsFloats();
-                    float yawRadians = yRotationFromQuaternion(deviceOrientation[0],
+                    devicePosition = devicePose.getTranslationAsFloats();
+                    deviceOrientation = devicePose.getRotationAsFloats();
+                    yawRadians = yRotationFromQuaternion(deviceOrientation[0],
                             deviceOrientation[1], deviceOrientation[2],
                             deviceOrientation[3]);
 
@@ -441,7 +443,7 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
         String fname = "Image-"+ n +".png";
         File file = new File (myPath, fname);
 
-        //Add the photo to the gallery
+
 
 
 
@@ -452,10 +454,13 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
             bmp2.compress(Bitmap.CompressFormat.PNG,100,bmpFileStream);
             bmpFileStream.flush();
             bmpFileStream.close();
+
+            //Add the photo to the gallery
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             Uri contentUri = Uri.fromFile(file);
             mediaScanIntent.setData(contentUri);
             this.sendBroadcast(mediaScanIntent);
+
             Toast.makeText(cw, text, duration).show();
         }
         catch (Exception e)
@@ -477,31 +482,23 @@ public class FloorPlanReconstructionActivity extends Activity implements Floorpl
             if(ev.getAction() == MotionEvent.ACTION_DOWN)
             {
                 canvas = mFloorplanView.getCanvas();
-
+                //Add the x and y coordinates to the point
                 Point p = new Point();
-                p.x = (int)ev.getRawX();
-                p.y = (int)ev.getRawY();
+                p.x = (int)(ev.getRawX());
+                p.y = (int)(ev.getRawY());
 
                 points.add(p);
-                //X = ev.getRawX();
-                //Y = ev.getRawY();
-                //canvas.drawColor(Color.RED);
-
 
                 Log.d(getClass().getSimpleName(), "X: " + p.x + " Y: " + p.y + "COLOR: " + Color.RED);
                 mFloorplanView.releaseCanvas(canvas);
-                //return true;
-                //mFloorplanView.invalidate();
+
             }
         }
         catch (Exception e)
         {
 
         }
-
-
-        return false;
-
+        return true;
     }
 
 

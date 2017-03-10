@@ -195,6 +195,8 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         // Update position and orientation based on the device position and orientation.
         canvas.concat(mCamera);
 
+
+
         // Draw all the polygons. Make a shallow copy in case mPolygons is reset while rendering.
         List<TangoPolygon> drawPolygons = mPolygons;
         for (TangoPolygon polygon : drawPolygons) {
@@ -231,20 +233,21 @@ public class FloorplanView extends SurfaceView implements SurfaceHolder.Callback
         // Draw a user / device marker.
         canvas.concat(mCameraInverse);
         canvas.drawPath(mUserMarkerPath, mUserMarkerPaint);
+
+
+        //Make the points static to the map using the camera matrix
         canvas.concat(mCamera);
-        //draw the points to the canvas(more than one will stay)
+        //canvas.translate(-translationX, -translationY);
+
+        //Draw the points to the canvas(more than one will stay)
         for(Point point: FloorPlanReconstructionActivity.points)
         {
-
-            canvas.drawCircle((point.x-703), (point.y-1350), 20, paint);
-            canvas.drawPoint((point.x-703), (point.y-1350), paint2);
-
-
+            canvas.drawCircle((point.x-703), (point.y-1380), 20, paint);
+            canvas.drawPoint((point.x-703), (point.y-1380), paint2);
         }
 
 
 
-        //invalidate();
     }
 
     /**
